@@ -16,11 +16,12 @@ def create_post(request):
         body =  json.loads(request.body.decode('utf-8'))
         
         new_post = Post.objects.create(
-            category    = body['category'],
+            category    =  body['category'],
             writer      =  body['writer'],
             color       =  body['color'],
             title       =  body['title'],
-            content     =  body['content']
+            content     =  body['content'],
+            photo       =  body['photo']
         )
 
         new_post_json={
@@ -31,6 +32,7 @@ def create_post(request):
             "title"     : new_post.title,
             "content"   : new_post.content,
             "pup_date"  : new_post.pup_date,
+            "photo"     : new_post.photo,
         }
 
         return JsonResponse({
@@ -56,6 +58,7 @@ def get_post_all(request, get_category):
                 "title"     : post.title,
                 "content"   : post.content,
                 "pup_date"  : post.pup_date,
+                "photo"     : post.photo,
             }
             category_post_json.append(post_json_set)
         
@@ -79,6 +82,7 @@ def get_post_detail(request, id):
             "title"     : post.title,
             "content"   : post.content,
             "pup_date"  : post.pup_date,
+            "photo"     : post.photo,
         }
     
         return JsonResponse({
@@ -100,6 +104,7 @@ def update_post(request, id):
         update_post.writer = body['writer']
         update_post.title = body['title']
         update_post.content = body['content']
+        update_post.photo = body['photo']
         update_post.save()
 
         update_post_json={
@@ -110,6 +115,7 @@ def update_post(request, id):
             "title"     : update_post.title,
             "content"   : update_post.content,
             "pup_date"  : update_post.pup_date,
+            "photo"     : update_post.photo,
         }
 
         return JsonResponse({
