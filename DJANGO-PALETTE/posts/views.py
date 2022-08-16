@@ -6,12 +6,13 @@ from django.http.response import JsonResponse
 #from django.core.serializers import register_serializer
 from django.views.decorators.http import require_http_methods
 import json
+from django.http.response import HttpResponseForbidden
+
 
 # Create your views here.
-@require_http_methods(['POST', 'GET'])
-
+@require_http_methods(['POST'])
 def create_post(request):
-    if request.method == "POST":
+    if _writer_permission(new_post.writer.id, request.user):
         body =  json.loads(request.body.decode('utf-8'))
         
         new_post = Post.objects.create(
@@ -39,16 +40,10 @@ def create_post(request):
                 'data': new_post_json
             })
 
-    return JsonResponse({
-                'status': 405,
-                'success': False,
-                'message': 'create_post 실패',
-                'data': None
-        })
 
+@require_http_methods(["GET"])
 def get_post_all(request, get_category):
-    if request.method == 'GET':
-        # post_all = Post.objects.all()
+    if _writer_permission(post.writer.id, request.user):
         category_post = Post.objects.filter(category=get_category)
         
         category_post_json=[] 
@@ -71,17 +66,11 @@ def get_post_all(request, get_category):
                 'data': category_post_json
             })
 
-    return JsonResponse({
-                'status': 405,
-                'success': False,
-                'message': 'get_post_all 실패',
-                'data': None
-            })
-
-def get_post(request, id):
-    if request.method == "GET":
-        post = get_object_or_404(Post,pk = id)
-
+@require_http_methods(["GET"])
+def get_post_detail(request, id):
+        
+    post = get_object_or_404(Post,pk = id)
+    if _writer_permission(post.writer.id, request.user):
         post_json={
             "id"        : post.id,
             "category"  : post.category,
@@ -91,23 +80,18 @@ def get_post(request, id):
             "content"   : post.content,
             "pup_date"  : post.pup_date,
         }
-        
+    
         return JsonResponse({
-                'status': 200,
-                'success': True,
-                'message': 'get_post 성공',
-                'data': post_json
-            })
+            'status': 200,
+            'success': True,
+            'message': 'get_post 성공',
+            'data': post_json
+        })
 
-    return JsonResponse({
-                'status': 405,
-                'success': False,
-                'message': 'get_post 실패',
-                'data': None
-            })
 
+@require_http_methods(["PATCH"])
 def update_post(request, id):
-    if request.method == "PATCH":
+    if _writer_permission(update_post.writer.id, request.user):
         body =  json.loads(request.body.decode('utf-8'))
         update_post = get_object_or_404(Post, pk = id)
 
@@ -135,15 +119,10 @@ def update_post(request, id):
             'data': update_post_json
         })
 
-    return JsonResponse({
-        'status': 405,
-        'success': False,
-        'message': 'update_post 실패',
-        'data': None
-    })
 
+@require_http_methods(["DELETE"])
 def delete_post(request, id):
-    if request.method == "DELETE":
+    if _writer_permission(delete_post.writer.id, request.user):
         delete_post = get_object_or_404(Post, pk = id)
         delete_post.delete()
 
@@ -154,15 +133,11 @@ def delete_post(request, id):
                 'data': None
             })
 
-    return JsonResponse({
-            'status': 405,
-            'success': False,
-            'message': 'delete_post 실패',
-            'data': None
-        })
 
+
+@require_http_methods(["GET"])
 def get_prev_post(request, get_category, id):
-    if request.method == "GET":
+    if _writer_permission(prev_post.writer.id, request.user):
         category_post = Post.objects.filter(category=get_category)
 
         # id_set = Post.objects.filter(id__lt=id) # 특정값보다 작은 데이터만 조회
@@ -186,15 +161,9 @@ def get_prev_post(request, get_category, id):
                 'data': prev_post_json
             })
 
-    return JsonResponse({
-                'status': 405,
-                'success': False,
-                'message': 'get_prev_post 실패',
-                'data': None
-            })
 
 def get_next_post(request, get_category, id):
-    if request.method == "GET":
+    if _writer_permission(next_post.writer.id, request.user):
         category_post = Post.objects.filter(category=get_category)
 
         id_set = category_post.values_list('id', flat=True)
@@ -214,9 +183,9 @@ def get_next_post(request, get_category, id):
                 'data': next_post_json
             })
 
-    return JsonResponse({
-                'status': 405,
-                'success': False,
-                'message': 'get_next_post 실패',
-                'data': None
-            })
+
+def _writer_permission(user, request_user):
+    if user.id == request_user.id:
+        return True
+    else:
+        return HttpResponseForbidden("접근 권한이 없습니다.")
