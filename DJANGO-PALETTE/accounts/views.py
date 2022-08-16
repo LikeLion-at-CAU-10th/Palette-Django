@@ -9,7 +9,7 @@ from django.views.decorators.http import require_http_methods
 import json
 # Create your views here.
 
-@require_http_methods(['POST', 'GET'])
+
 
 def create_user(request):
     if(request.method == 'POST'):

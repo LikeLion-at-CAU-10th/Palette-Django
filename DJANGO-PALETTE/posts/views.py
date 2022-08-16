@@ -161,7 +161,7 @@ def get_prev_post(request, get_category, id):
                 'data': prev_post_json
             })
 
-
+@require_http_methods(["GET"])
 def get_next_post(request, get_category, id):
     if _writer_permission(next_post.writer.id, request.user):
         category_post = Post.objects.filter(category=get_category)
