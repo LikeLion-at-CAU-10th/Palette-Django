@@ -44,68 +44,6 @@ def create_user(request):
                 'data': None
         })
 
-def user_login2(request): # cookie
-    if request.COOKIES.get('userId') is not None:
-        userId = request.COOKIES.get('userId')
-        password = request.COOKIES.get('password')
-        user = auth.authenticate(request, userId=userId, password=password)
-        if user is not None:
-            auth.login(request, user)
-
-            login_json={
-                "userId"   : request.POST['userId'],
-                "nickname" : request.POST['nickname'],
-                "category" : request.POST['category'],
-            }
-
-            return JsonResponse({
-                'status': 200,
-                'success': True,
-                'message': 'login 성공',
-                'data': login_json
-            })
-        else:
-            return JsonResponse({
-                'status': 403,
-                'success': False,
-                'message': 'login 실패',
-                'data': None
-        })
-
-    elif request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
-        # 해당 user가 있으면 username, 없으면 None
-        user = auth.authenticate(request, username=username, password=password)
-
-        if user is not None:
-            auth.login(request, user)
-            if request.POST.get("keep_login") == "TRUE":
-                response = render(request, 'account/home.html')
-                response.set_cookie('username', username)
-                response.set_cookie('password', password)
-                return response
-            return JsonResponse({
-                'status': 200,
-                'success': True,
-                'message': 'login 성공',
-                'data': login_json
-            })
-        else:
-            return JsonResponse({
-                'status': 403,
-                'success': False,
-                'message': 'login 실패',
-                'data': None
-        })
-    else:
-        return JsonResponse({
-                'status': 403,
-                'success': False,
-                'message': 'login 실패',
-                'data': None
-        })
-
 def user_login(request):
     if request.method == 'POST' :
         body = json.loads(request.body.decode('utf-8'))
