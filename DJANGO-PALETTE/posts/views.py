@@ -71,7 +71,7 @@ def get_post_detail(request, id):
         
     post = get_object_or_404(Post,pk = id)
     if _writer_permission(post.writer.id, request.user):
-        post_json={
+        post_detail_json={
             "id"        : post.id,
             "category"  : post.category,
             "writer"    : post.writer,
@@ -85,7 +85,7 @@ def get_post_detail(request, id):
             'status': 200,
             'success': True,
             'message': 'get_post 성공',
-            'data': post_json
+            'data': post_detail_json
         })
 
 
