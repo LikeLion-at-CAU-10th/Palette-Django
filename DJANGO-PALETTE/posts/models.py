@@ -12,7 +12,7 @@ class Post(models.Model):
         ("04", "yellow"),
         ("05", "orange"),
         ("06", "red"),
-        ("07", "pink"),
+        ("07", "purple"),
     )
 
     category = models.CharField(max_length=10, choices=CHOICES)
